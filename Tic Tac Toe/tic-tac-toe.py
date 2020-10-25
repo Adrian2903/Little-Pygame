@@ -2,6 +2,7 @@
 import pygame
 import sys
 
+# setting global variable
 XO = "X"
 winner = None
 draw = False
