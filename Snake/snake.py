@@ -70,12 +70,12 @@ def game_loop():
             dis.fill(BLACK)
             your_score(snake_length-1)
 
-            f = open("E:\Lang\Belajar Python\Snake Game\highscore.txt", "r")
+            f = open("E:\Lang\Belajar Python\Little-Pygame\Snake\highscore.txt", "r")
             score = f.read()
             score = max(int(score), snake_length-1)
             f.close()
 
-            f = open("E:\Lang\Belajar Python\Snake Game\highscore.txt", "w")
+            f = open("E:\Lang\Belajar Python\Little-Pygame\Snake\highscore.txt", "w")
             f.write(str(score))
             f.close()
             message("You Lost! Press Q-Quit or C-Play Again", RED)
