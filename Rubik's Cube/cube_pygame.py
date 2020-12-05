@@ -16,7 +16,7 @@ COLORS = {
     "G": GREEN,
     "B": BLUE,
     "O": ORANGE,
-    "Y": YELLOW
+    "Y": YELLOW,
 }
 FONT = pg.font.SysFont('Comic Sans MS', 32)
 SCRAMBLE_FONT = pg.font.SysFont('Comic Sans MS', 20)
@@ -157,6 +157,39 @@ class Cube:
         elif rotation == "F2":
             for _ in range(2):
                 self.move("F")
+        elif rotation == "Y":
+            self.top = self.rotate(self.top)
+            self.front, self.left, self.back, self.right = self.right, self.front, self.left, self.back
+            for _ in range(3):
+                self.bottom = self.rotate(self.bottom)
+        elif rotation == "Y'":
+            for _ in range(3):
+                self.move("Y")
+        elif rotation == "Y2":
+            for _ in range(2):
+                self.move("Y")
+        elif rotation == "X":
+            self.right = self.rotate(self.right)
+            self.front, self.top, self.back, self.bottom = self.bottom, self.front, [row[::-1] for row in self.top[::-1]], [row[::-1] for row in self.back[::-1]]
+            for _ in range(3):
+                self.left = self.rotate(self.left)
+        elif rotation == "X'":
+            for _ in range(3):
+                self.move("X")
+        elif rotation == "X2":
+            for _ in range(2):
+                self.move("X")
+        elif rotation == "Z":
+            self.front = self.rotate(self.front)
+            self.right, self.top, self.left, self.bottom = [[row[i] for row in self.top][::-1] for i in range(3)], [[row[i] for row in self.left][::-1] for i in range(3)], [[row[i] for row in self.bottom][::-1] for i in range(3)], [[row[i] for row in self.right][::-1] for i in range(3)]
+            for _ in range(3):
+                self.back = self.rotate(self.back)
+        elif rotation == "Z'":
+            for _ in range(3):
+                self.move("Z")
+        elif rotation == "Z2":
+            for _ in range(2):
+                self.move("Z")
 
     def __str__(self):
         for i, colors in enumerate(self.top):
@@ -237,14 +270,14 @@ class Game:
         self.cube = Cube()
         self.scramble = self.cube.scramble()
         self.lines = [[""] * 12, [""] * 12, [""] * 12, [""] * 12, [""] * 12, [""] * 12, [""] * 12, [""] * 12, [""] * 12]
-        self.base = ["U", "D", "R", "L", "F", "B"]
+        self.base = ["U", "D", "R", "L", "F", "B", "X", "Y", "Z"]
         self.power = ["", "'", "2"]
         self.all_sprites = pg.sprite.Group()
         for j in range(502, 700, 66):
-            for i in range(0, 600, 100):
+            for i in range(6, 600, 66):
                 self.all_sprites.add(
                     Button(
-                        i, j, 60, 60, self.cube.move, text=self.base[i//100]+self.power[(j-502)//66]
+                        i, j, 60, 60, self.cube.move, text=self.base[(i-6)//66]+self.power[(j-502)//66]
                     )
                 )
 
@@ -315,11 +348,24 @@ class Game:
         text_rect = msg.get_rect(center=(300, 25))
         screen.blit(msg, text_rect)
         self.all_sprites.draw(self.screen)
-        for i, colors in enumerate(self.lines):
+        for i, colors in enumerate(self.cube.top):
             for j, color in enumerate(colors):
-                if color:
-                    pg.draw.rect(self.screen, COLORS[color], (j * 50, i * 50 + 50, 50, 50))
-                    pg.draw.rect(self.screen, (0, 0, 0), (j * 50, i * 50 + 50, 50, 50), 1)
+                pg.draw.polygon(self.screen, COLORS[color], ((50*j-30*i+240, 40*i+150), (50*j-30*i+290, 40*i+150), (50*j-30*i+260, 40*i+190), (50*j-30*i+210, 40*i+190)))
+                pg.draw.polygon(self.screen, (0, 0, 0), ((50*j-30*i+240, 40*i+150), (50*j-30*i+290, 40*i+150), (50*j-30*i+260, 40*i+190), (50*j-30*i+210, 40*i+190)), 1)
+        for i, colors in enumerate(self.cube.front):
+            for j, color in enumerate(colors):
+                pg.draw.polygon(self.screen, COLORS[color], ((50*j+150, 50*i+270), (50*j+200, 50*i+270), (50*j+200, 50*i+320), (50*j+150, 50*i+320)))
+                pg.draw.polygon(self.screen, (0, 0, 0), ((50*j+150, 50*i+270), (50*j+200, 50*i+270), (50*j+200, 50*i+320), (50*j+150, 50*i+320)), 1)
+        for i, colors in enumerate(self.cube.right):
+            for j, color in enumerate(colors):
+                pg.draw.polygon(self.screen, COLORS[color], ((30*j+300, 50*i-40*j+270), (30*j+330, 50*i-40*j+230), (30*j+330, 50*i-40*j+280), (30*j+300, 50*i-40*j+320)))
+                pg.draw.polygon(self.screen, (0, 0, 0), ((30*j+300, 50*i-40*j+270), (30*j+330, 50*i-40*j+230), (30*j+330, 50*i-40*j+280), (30*j+300, 50*i-40*j+320)), 1)
+
+        # for i, colors in enumerate(self.lines):
+        #     for j, color in enumerate(colors):
+        #         if color:
+        #             pg.draw.rect(self.screen, COLORS[color], (j * 50, i * 50 + 50, 50, 50))
+        #             pg.draw.rect(self.screen, (0, 0, 0), (j * 50, i * 50 + 50, 50, 50), 1)
         pg.display.flip()
 
 if __name__ == "__main__":
