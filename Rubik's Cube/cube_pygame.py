@@ -2,6 +2,7 @@ import random
 import pygame as pg
 # from pygame import *
 
+
 pg.init()
 screen = pg.display.set_mode((600, 700))
 WHITE = (255, 255, 255)
@@ -18,14 +19,16 @@ COLORS = {
     "O": ORANGE,
     "Y": YELLOW,
 }
-FONT = pg.font.SysFont('Comic Sans MS', 32)
-SCRAMBLE_FONT = pg.font.SysFont('Comic Sans MS', 20)
+FONT = pg.font.SysFont('fangsong', 32)
+SCRAMBLE_FONT = pg.font.SysFont('dubai', 20)
 IMAGE_NORMAL = pg.Surface((100, 32))
 IMAGE_NORMAL.fill((WHITE))
 IMAGE_HOVER = pg.Surface((100, 32))
 IMAGE_HOVER.fill((20, 20, 20))
 IMAGE_DOWN = pg.Surface((100, 32))
 IMAGE_DOWN.fill((40, 40, 40))
+SECRET_IMAGE = pg.Surface((100, 32))
+SECRET_IMAGE.fill((30, 30, 30))
 invalid_cases = {
     "U": ["U", "D"],
     "D": ["U", "D"],
@@ -266,6 +269,7 @@ class Game:
         self.screen = screen
         self.cube = Cube()
         self.scramble = self.cube.scramble()
+        self.solver = []
         self.lines = [[""] * 12, [""] * 12, [""] * 12, [""] * 12, [""] * 12, [""] * 12, [""] * 12, [""] * 12, [""] * 12]
         self.base = ["U", "D", "R", "L", "F", "B", "X", "Y", "Z"]
         self.power = ["", "'", "2"]
@@ -277,16 +281,34 @@ class Game:
                         i, j, 60, 60, self.cube.move, text=self.base[(i-6)//66]+self.power[(j-502)//66]
                     )
                 )
+        self.all_sprites.add(Button(590, 0, 10, 10, self.solve, image_normal=SECRET_IMAGE))
 
     def check(self):
         self.solved = self.cube.is_solved()
 
+    def solve(self, nonsense):
+        nonsense = nonsense
+        for i in self.solver:
+            self.cube.move(i)
+
+    def create_solve(self):
+        self.solver = self.scramble.split()[::-1]
+        for i, j in enumerate(self.solver):
+            if "'" in j:
+                self.solver[i] = self.solver[i][0]
+            elif len(j) == 1:
+                self.solver[i] = self.solver[i][0] + "'"
+
     def play_again(self):
         done = True
         while done:
-            msg = "CONGRATULATIONS!!!\nPress y to play again or q to quit"
-            msg = FONT.render(f"{msg}", True, (0, 0, 0))
+            msg = "CONGRATULATIONS!!!"
+            msg = FONT.render(f"{msg}", True, (0, 200, 0))
             text_rect = msg.get_rect(center=(300, 225))
+            screen.blit(msg, text_rect)
+            msg = "Press y to play again or q to quit"
+            msg = FONT.render(f"{msg}", True, (0, 200, 0))
+            text_rect = msg.get_rect(center=(300, 250))
             screen.blit(msg, text_rect)
             pg.display.update()
             for event in pg.event.get():
@@ -303,6 +325,7 @@ class Game:
                         done = False
 
     def run(self):
+        self.create_solve()
         while not self.quit:
             self.handle_events()
             self.run_logic()
