@@ -1,6 +1,6 @@
 import random
 import pygame as pg
-from pygame import *
+# from pygame import *
 
 pg.init()
 screen = pg.display.set_mode((600, 700))
@@ -61,13 +61,10 @@ class Cube:
         movements.append(random.choice(moveset))
         while len(movements) < 20:
             move = random.choice(moveset)
-            valid = False
-            i = len(movements) - 1
-            while movements[i][0] != move[0] and i >= 0:
-                if movements[i][0] not in invalid_cases[move[0]]:
-                    valid = True
-                    break
-                i -= 1
+            valid = True
+            if movements[-1][0] in invalid_cases[move[0]]:
+                if len(movements) == 1 or movements[-1][0] == move[0] or movements[-2][0] in invalid_cases[move[0]]:
+                    valid = False
             if valid:
                 movements.append(move)
         for move in movements:
@@ -287,7 +284,7 @@ class Game:
     def play_again(self):
         done = True
         while done:
-            msg = "CONGRATULATIONS!!!"
+            msg = "CONGRATULATIONS!!!\nPress y to play again or q to quit"
             msg = FONT.render(f"{msg}", True, (0, 0, 0))
             text_rect = msg.get_rect(center=(300, 225))
             screen.blit(msg, text_rect)
@@ -295,6 +292,15 @@ class Game:
             for event in pg.event.get():
                 if event.type == pg.QUIT:
                     done = False
+                if event.type == pg.KEYDOWN:
+                    if event.key == pg.K_y:
+                        done = False
+                        self.scramble = self.cube.scramble()
+                        self.quit = False
+                        self.solved = False
+                        self.run()
+                    if event.key == pg.K_q:
+                        done = False
 
     def run(self):
         while not self.quit:
