@@ -1,7 +1,6 @@
 import random
 import pygame as pg
 # from pygame import *
-# random comment
 
 pg.init()
 screen = pg.display.set_mode((600, 700))
